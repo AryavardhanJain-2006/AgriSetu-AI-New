@@ -1,411 +1,49 @@
-{
-  "rules": {
-    ".read": false,
-    ".write": false,
-    "profiles": {
-      "$uid": {
-        ".read": "auth != null && auth.uid === $uid",
-        ".write": "auth != null && auth.uid === $uid",
-        ".validate": "newData.hasChildren(['name', 'email'])",
-        "name": {
-          ".validate": "newData.isString() && newData.val().length <= 100"
-        },
-        "email": {
-          ".validate": "newData.isString() && newData.val().length <= 254"
-        },
-        "phone": {
-          ".validate": "!newData.exists() || (newData.isString() && newData.val().length <= 30)"
-        },
-        "roleRequested": {
-          ".validate": "!newData.exists() || (newData.isString() && (newData.val() === 'Farmer' || newData.val() === 'Cold Storage' || newData.val() === 'Porter' || newData.val() === 'Buyer'))"
-        },
-        "storageName": {
-          ".validate": "!newData.exists() || (newData.isString() && newData.val().length <= 120)"
-        },
-        "partnerName": {
-          ".validate": "!newData.exists() || (newData.isString() && newData.val().length <= 100)"
-        },
-        "$other": {
-          ".validate": false
-        }
-      }
-    },
-    "accessRequests": {
-      "$uid": {
-        ".read": "auth != null && auth.uid === $uid",
-        ".write": "auth != null && auth.uid === $uid && !data.exists()",
-        ".validate": "newData.hasChildren(['requestedRole', 'status', 'createdAt']) && newData.child('status').val() === 'PENDING'",
-        "requestedRole": {
-          ".validate": "newData.isString() && (newData.val() === 'Farmer' || newData.val() === 'Cold Storage' || newData.val() === 'Porter' || newData.val() === 'Buyer')"
-        },
-        "requestedStorageName": {
-          ".validate": "!newData.exists() || (newData.isString() && newData.val().length <= 120)"
-        },
-        "status": {
-          ".validate": "newData.val() === 'PENDING'"
-        },
-        "createdAt": {
-          ".validate": "newData.isNumber()"
-        },
-        "$other": {
-          ".validate": false
-        }
-      }
-    },
-    "userAccess": {
-      "$uid": {
-        ".read": "auth != null && auth.uid === $uid",
-        ".write": "auth != null && auth.uid === $uid && !data.exists() && newData.child('active').val() === true && newData.child('role').val() === root.child('profiles').child($uid).child('roleRequested').val() && (newData.child('role').val() === 'Farmer' || newData.child('role').val() === 'Cold Storage' || newData.child('role').val() === 'Porter' || newData.child('role').val() === 'Buyer') && (newData.child('role').val() !== 'Cold Storage' || (newData.child('facilityId').isString() && newData.child('storageName').isString() && newData.child('registrationCode').isString() && root.child('facilityRegistrationCodes').child(newData.child('facilityId').val()).val() === newData.child('registrationCode').val()))",
-        ".validate": "newData.hasChildren(['active', 'role']) && newData.child('active').val() === true && (newData.child('role').val() === 'Farmer' || newData.child('role').val() === 'Cold Storage' || newData.child('role').val() === 'Porter' || newData.child('role').val() === 'Buyer')",
-        "active": {
-          ".validate": "newData.isBoolean() && newData.val() === true"
-        },
-        "role": {
-          ".validate": "newData.isString() && (newData.val() === 'Farmer' || newData.val() === 'Cold Storage' || newData.val() === 'Porter' || newData.val() === 'Buyer')"
-        },
-        "facilityId": {
-          ".validate": "!newData.exists() || (newData.isString() && (newData.val() === 'COLD_BOX_01' || newData.val() === 'GREEN_FRESH_01' || newData.val() === 'YAMUNA_COLD_01'))"
-        },
-        "storageName": {
-          ".validate": "!newData.exists() || (newData.isString() && newData.val().length <= 120)"
-        },
-        "registrationCode": {
-          ".validate": "!newData.exists() || (newData.isString() && newData.val().length >= 12 && newData.val().length <= 128)"
-        },
-        "createdAt": {
-          ".validate": "!newData.exists() || newData.isNumber()"
-        },
-        "$other": {
-          ".validate": false
-        }
-      }
-    },
-    "deviceAccess": {
-      ".read": false,
-      ".write": false
-    },
-    "facilities": {
-      "$facilityId": {
-        "latest": {
-          ".read": "auth != null && root.child('userAccess').child(auth.uid).child('active').val() === true && ((root.child('userAccess').child(auth.uid).child('role').val() === 'Admin') || (root.child('userAccess').child(auth.uid).child('role').val() === 'Cold Storage' && root.child('userAccess').child(auth.uid).child('facilityId').val() === $facilityId) || (root.child('userAccess').child(auth.uid).child('role').val() === 'Farmer' && (root.child('userAccess').child(auth.uid).child('facilityIds').child($facilityId).val() === true || root.child('monitoringAccess').child(auth.uid).child('facilityIds').child($facilityId).child('enabled').val() === true)))",
-          ".write": "auth != null && root.child('deviceAccess').child(auth.uid).child('enabled').val() === true && root.child('deviceAccess').child(auth.uid).child('facilityId').val() === $facilityId && newData.exists()",
-          ".validate": "newData.hasChildren(['facility_id', 'temperature', 'humidity', 'methane_ppm', 'raw_adc', 'sensor_voltage', 'device_timestamp_ms', 'received_at'])",
-          "facility_id": {
-            ".validate": "newData.isString() && newData.val() === $facilityId"
-          },
-          "temperature": {
-            ".validate": "newData.isNumber() && newData.val() >= -40 && newData.val() <= 100"
-          },
-          "humidity": {
-            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100"
-          },
-          "methane_ppm": {
-            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 500"
-          },
-          "raw_adc": {
-            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 4095"
-          },
-          "sensor_voltage": {
-            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 10"
-          },
-          "device_timestamp_ms": {
-            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 4294967295"
-          },
-          "received_at": {
-            ".validate": "newData.isNumber() && newData.val() > 0"
-          },
-          "$other": {
-            ".validate": false
-          }
-        },
-        "history": {
-          ".read": "auth != null && root.child('userAccess').child(auth.uid).child('active').val() === true && ((root.child('userAccess').child(auth.uid).child('role').val() === 'Admin') || (root.child('userAccess').child(auth.uid).child('role').val() === 'Cold Storage' && root.child('userAccess').child(auth.uid).child('facilityId').val() === $facilityId) || (root.child('userAccess').child(auth.uid).child('role').val() === 'Farmer' && (root.child('userAccess').child(auth.uid).child('facilityIds').child($facilityId).val() === true || root.child('monitoringAccess').child(auth.uid).child('facilityIds').child($facilityId).child('enabled').val() === true)))",
-          ".indexOn": [
-            "received_at"
-          ],
-          "$recordId": {
-            ".write": "auth != null && root.child('deviceAccess').child(auth.uid).child('enabled').val() === true && root.child('deviceAccess').child(auth.uid).child('facilityId').val() === $facilityId && newData.exists() && $recordId.matches(/^slot_([0-9]{1,4}|100[0-6][0-9]|1007[0-9])$/)",
-            ".validate": "newData.hasChildren(['facility_id', 'temperature', 'humidity', 'methane_ppm', 'raw_adc', 'sensor_voltage', 'device_timestamp_ms', 'received_at'])",
-            "facility_id": {
-              ".validate": "newData.isString() && newData.val() === $facilityId"
-            },
-            "temperature": {
-              ".validate": "newData.isNumber() && newData.val() >= -40 && newData.val() <= 100"
-            },
-            "humidity": {
-              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100"
-            },
-            "methane_ppm": {
-              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 500"
-            },
-            "raw_adc": {
-              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 4095"
-            },
-            "sensor_voltage": {
-              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 10"
-            },
-            "device_timestamp_ms": {
-              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 4294967295"
-            },
-            "received_at": {
-              ".validate": "newData.isNumber() && newData.val() > 0"
-            },
-            "$other": {
-              ".validate": false
-            }
-          }
-        }
-      }
-    },
-    "monitoringBookings": {
-      ".read": false,
-      ".write": false
-    },
-    "storageBookings": {
-      "$facilityId": {
-        "$bookingId": {
-          ".read": "auth != null && root.child('userAccess').child(auth.uid).child('active').val() === true && (root.child('userAccess').child(auth.uid).child('role').val() === 'Admin' || (root.child('userAccess').child(auth.uid).child('role').val() === 'Cold Storage' && root.child('userAccess').child(auth.uid).child('facilityId').val() === $facilityId) || (root.child('userAccess').child(auth.uid).child('role').val() === 'Farmer' && data.child('farmerUid').val() === auth.uid))",
-          ".write": "auth != null && root.child('userAccess').child(auth.uid).child('active').val() === true && ((root.child('userAccess').child(auth.uid).child('role').val() === 'Farmer' && !data.exists() && newData.child('farmerUid').val() === auth.uid && newData.child('facilityId').val() === $facilityId && newData.child('status').val() === 'PENDING') || (root.child('userAccess').child(auth.uid).child('role').val() === 'Cold Storage' && root.child('userAccess').child(auth.uid).child('facilityId').val() === $facilityId && data.exists() && data.child('farmerUid').val() === newData.child('farmerUid').val() && data.child('farmerEmail').val() === newData.child('farmerEmail').val() && data.child('farmerName').val() === newData.child('farmerName').val() && data.child('facilityId').val() === $facilityId && data.child('storage').val() === newData.child('storage').val() && data.child('product').val() === newData.child('product').val() && data.child('batchId').val() === newData.child('batchId').val() && data.child('quantity').val() === newData.child('quantity').val() && data.child('createdAt').val() === newData.child('createdAt').val() && ((data.child('status').val() === 'PENDING' && (newData.child('status').val() === 'ACCEPTED' || newData.child('status').val() === 'REJECTED')) || (data.child('status').val() === 'ACCEPTED' && newData.child('status').val() === 'ACCEPTED' && data.child('acceptedBy').val() === auth.uid)) && ((newData.child('status').val() === 'ACCEPTED' && newData.child('acceptedBy').val() === auth.uid && newData.child('acceptedAt').isNumber()) || (newData.child('status').val() === 'REJECTED' && newData.child('rejectedBy').val() === auth.uid && newData.child('rejectedAt').isNumber()))) || (root.child('userAccess').child(auth.uid).child('role').val() === 'Admin'))",
-          ".validate": "newData.hasChildren(['id','farmerUid','farmerEmail','farmerName','facilityId','storage','product','batchId','quantity','createdAt','status'])",
-          "id": {
-            ".validate": "newData.isString() && newData.val() === $bookingId"
-          },
-          "farmerUid": {
-            ".validate": "newData.isString() && newData.val().length > 0"
-          },
-          "farmerEmail": {
-            ".validate": "newData.isString() && newData.val().length <= 254"
-          },
-          "farmerName": {
-            ".validate": "newData.isString() && newData.val().length <= 100"
-          },
-          "facilityId": {
-            ".validate": "newData.isString() && newData.val() === $facilityId"
-          },
-          "storage": {
-            ".validate": "newData.isString() && newData.val().length <= 120"
-          },
-          "storageId": {
-            ".validate": "!newData.exists() || (newData.isString() && newData.val().length <= 120)"
-          },
-          "storageOwnerEmail": {
-            ".validate": "!newData.exists() || (newData.isString() && newData.val().length <= 254)"
-          },
-          "storageLocation": {
-            ".validate": "!newData.exists() || (newData.isString() && newData.val().length <= 120)"
-          },
-          "product": {
-            ".validate": "newData.isString() && newData.val().length <= 100"
-          },
-          "batchId": {
-            ".validate": "newData.isString() && newData.val().length <= 100"
-          },
-          "quantity": {
-            ".validate": "newData.isNumber() && newData.val() > 0 && newData.val() <= 100000000"
-          },
-          "createdAt": {
-            ".validate": "newData.isNumber() && newData.val() > 0"
-          },
-          "status": {
-            ".validate": "newData.isString() && (newData.val() === 'PENDING' || newData.val() === 'ACCEPTED' || newData.val() === 'REJECTED')"
-          },
-          "acceptedAt": {
-            ".validate": "!newData.exists() || newData.isNumber()"
-          },
-          "acceptedBy": {
-            ".validate": "!newData.exists() || newData.isString()"
-          },
-          "rejectedAt": {
-            ".validate": "!newData.exists() || newData.isNumber()"
-          },
-          "rejectedBy": {
-            ".validate": "!newData.exists() || newData.isString()"
-          },
-          "$other": {
-            ".validate": false
-          }
-        },
-        ".read": "auth != null && root.child('userAccess').child(auth.uid).child('active').val() === true && (root.child('userAccess').child(auth.uid).child('role').val() === 'Admin' || (root.child('userAccess').child(auth.uid).child('role').val() === 'Cold Storage' && root.child('userAccess').child(auth.uid).child('facilityId').val() === $facilityId))"
-      }
-    },
-    "monitoringAccess": {
-      "$farmerUid": {
-        ".read": "auth != null && (auth.uid === $farmerUid || root.child('userAccess').child(auth.uid).child('role').val() === 'Admin')",
-        "facilityIds": {
-          "$facilityId": {
-            ".write": "auth != null && root.child('userAccess').child(auth.uid).child('active').val() === true && ((root.child('userAccess').child(auth.uid).child('role').val() === 'Admin') || (root.child('userAccess').child(auth.uid).child('role').val() === 'Cold Storage' && root.child('userAccess').child(auth.uid).child('facilityId').val() === $facilityId && newData.child('enabled').val() === true && newData.child('bookingId').isString() && root.child('storageBookings').child($facilityId).child(newData.child('bookingId').val()).child('farmerUid').val() === $farmerUid && root.child('storageBookings').child($facilityId).child(newData.child('bookingId').val()).child('status').val() === 'ACCEPTED'))",
-            ".validate": "newData.hasChildren(['enabled','bookingId','grantedAt'])",
-            "enabled": {
-              ".validate": "newData.isBoolean() && newData.val() === true"
-            },
-            "bookingId": {
-              ".validate": "newData.isString() && newData.val().length > 0"
-            },
-            "grantedAt": {
-              ".validate": "newData.isNumber() && newData.val() > 0"
-            },
-            "$other": {
-              ".validate": false
-            }
-          }
-        }
-      }
-    },
-    "farmerAIReports": {
-      "$farmerUid": {
-        ".read": "auth != null && root.child('userAccess').child(auth.uid).child('active').val() === true && ((auth.uid === $farmerUid && root.child('userAccess').child(auth.uid).child('role').val() === 'Farmer') || root.child('userAccess').child(auth.uid).child('role').val() === 'Admin')",
-        "$reportId": {
-          ".write": "auth != null && root.child('userAccess').child(auth.uid).child('active').val() === true && root.child('userAccess').child(auth.uid).child('role').val() === 'Farmer' && auth.uid === $farmerUid && !data.exists() && newData.child('farmerUid').val() === auth.uid && ((newData.child('booked').val() === false) || (newData.child('booked').val() === true && newData.child('facilityId').isString() && newData.child('bookingId').isString() && newData.child('batchId').isString() && root.child('storageBookings').child(newData.child('facilityId').val()).child(newData.child('bookingId').val()).child('status').val() === 'ACCEPTED' && root.child('storageBookings').child(newData.child('facilityId').val()).child(newData.child('bookingId').val()).child('farmerUid').val() === auth.uid && root.child('storageBookings').child(newData.child('facilityId').val()).child(newData.child('bookingId').val()).child('batchId').val() === newData.child('batchId').val()))",
-          ".validate": "newData.hasChildren(['id','farmerUid','farmerName','crop','confidence','classifier','classificationLabel','temperatureC','humidityPct','co2Available','co2UsedPpm','storageDurationDays','remainingShelfLifeDays','spoilageRatePctDay','riskLevel','recommendation','booked','createdAt'])",
-          "id": {
-            ".validate": "newData.isString() && newData.val() === $reportId"
-          },
-          "farmerUid": {
-            ".validate": "newData.isString() && newData.val().length > 0"
-          },
-          "farmerName": {
-            ".validate": "newData.isString() && newData.val().length <= 100"
-          },
-          "crop": {
-            ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 50"
-          },
-          "confidence": {
-            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1"
-          },
-          "classifier": {
-            ".validate": "newData.isString() && newData.val().length <= 100"
-          },
-          "classificationLabel": {
-            ".validate": "newData.isString() && newData.val().length <= 160"
-          },
-          "temperatureC": {
-            ".validate": "newData.isNumber() && newData.val() >= -40 && newData.val() <= 100"
-          },
-          "humidityPct": {
-            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100"
-          },
-          "co2Available": {
-            ".validate": "newData.isBoolean()"
-          },
-          "co2Ppm": {
-            ".validate": "!newData.exists() || (newData.isNumber() && newData.val() >= 0 && newData.val() <= 100000)"
-          },
-          "co2UsedPpm": {
-            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100000"
-          },
-          "storageDurationDays": {
-            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 3650"
-          },
-          "remainingShelfLifeDays": {
-            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1000"
-          },
-          "spoilageRatePctDay": {
-            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100"
-          },
-          "riskLevel": {
-            ".validate": "newData.isString() && (newData.val() === 'HIGH RISK' || newData.val() === 'MEDIUM RISK' || newData.val() === 'LOW RISK (SAFE)')"
-          },
-          "recommendation": {
-            ".validate": "newData.isString() && newData.val().length <= 400"
-          },
-          "booked": {
-            ".validate": "newData.isBoolean()"
-          },
-          "createdAt": {
-            ".validate": "newData.isNumber() && newData.val() > 0"
-          },
-          "facilityId": {
-            ".validate": "!newData.exists() || (newData.isString() && newData.val().length <= 100)"
-          },
-          "bookingId": {
-            ".validate": "!newData.exists() || (newData.isString() && newData.val().length <= 120)"
-          },
-          "batchId": {
-            ".validate": "!newData.exists() || (newData.isString() && newData.val().length <= 120)"
-          },
-          "$other": {
-            ".validate": false
-          }
-        }
-      }
-    },
-    "facilityAIReports": {
-      "$facilityId": {
-        ".read": "auth != null && root.child('userAccess').child(auth.uid).child('active').val() === true && (root.child('userAccess').child(auth.uid).child('role').val() === 'Admin' || (root.child('userAccess').child(auth.uid).child('role').val() === 'Cold Storage' && root.child('userAccess').child(auth.uid).child('facilityId').val() === $facilityId))",
-        "$reportId": {
-          ".write": "auth != null && root.child('userAccess').child(auth.uid).child('active').val() === true && ((root.child('userAccess').child(auth.uid).child('role').val() === 'Admin') || (root.child('userAccess').child(auth.uid).child('role').val() === 'Farmer' && newData.child('farmerUid').val() === auth.uid && newData.child('booked').val() === true && newData.child('facilityId').val() === $facilityId && newData.child('facilityId').isString() && newData.child('bookingId').isString() && newData.child('batchId').isString() && root.child('storageBookings').child(newData.child('facilityId').val()).child(newData.child('bookingId').val()).child('status').val() === 'ACCEPTED' && root.child('storageBookings').child(newData.child('facilityId').val()).child(newData.child('bookingId').val()).child('farmerUid').val() === auth.uid && root.child('storageBookings').child(newData.child('facilityId').val()).child(newData.child('bookingId').val()).child('batchId').val() === newData.child('batchId').val())) && !data.exists()",
-          ".validate": "newData.hasChildren(['id','farmerUid','farmerName','crop','confidence','classifier','classificationLabel','temperatureC','humidityPct','co2Available','co2UsedPpm','storageDurationDays','remainingShelfLifeDays','spoilageRatePctDay','riskLevel','recommendation','booked','createdAt','facilityId','bookingId','batchId'])",
-          "id": {
-            ".validate": "newData.isString() && newData.val() === $reportId"
-          },
-          "farmerUid": {
-            ".validate": "newData.isString() && newData.val().length > 0"
-          },
-          "farmerName": {
-            ".validate": "newData.isString() && newData.val().length <= 100"
-          },
-          "crop": {
-            ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 50"
-          },
-          "confidence": {
-            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1"
-          },
-          "classifier": {
-            ".validate": "newData.isString() && newData.val().length <= 100"
-          },
-          "classificationLabel": {
-            ".validate": "newData.isString() && newData.val().length <= 160"
-          },
-          "temperatureC": {
-            ".validate": "newData.isNumber() && newData.val() >= -40 && newData.val() <= 100"
-          },
-          "humidityPct": {
-            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100"
-          },
-          "co2Available": {
-            ".validate": "newData.isBoolean()"
-          },
-          "co2Ppm": {
-            ".validate": "!newData.exists() || (newData.isNumber() && newData.val() >= 0 && newData.val() <= 100000)"
-          },
-          "co2UsedPpm": {
-            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100000"
-          },
-          "storageDurationDays": {
-            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 3650"
-          },
-          "remainingShelfLifeDays": {
-            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1000"
-          },
-          "spoilageRatePctDay": {
-            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100"
-          },
-          "riskLevel": {
-            ".validate": "newData.isString() && (newData.val() === 'HIGH RISK' || newData.val() === 'MEDIUM RISK' || newData.val() === 'LOW RISK (SAFE)')"
-          },
-          "recommendation": {
-            ".validate": "newData.isString() && newData.val().length <= 400"
-          },
-          "booked": {
-            ".validate": "newData.isBoolean()"
-          },
-          "createdAt": {
-            ".validate": "newData.isNumber() && newData.val() > 0"
-          },
-          "facilityId": {
-            ".validate": "!newData.exists() || (newData.isString() && newData.val().length <= 100)"
-          },
-          "bookingId": {
-            ".validate": "!newData.exists() || (newData.isString() && newData.val().length <= 120)"
-          },
-          "batchId": {
-            ".validate": "!newData.exists() || (newData.isString() && newData.val().length <= 120)"
-          },
-          "$other": {
-            ".validate": false
-          }
-        }
-      }
-    }
-  }
-}
+/* Styles used only by the AI Crop Analysis / AI Reports additions. */
+.ai-model-note{border:1px solid #cfe3d6;background:#f2faf5;color:#385846;padding:14px 16px;border-radius:12px;line-height:1.55;margin:16px 0 22px;font-size:13px}
+.ai-analysis-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:18px;align-items:start}
+.ai-camera-card,.ai-input-card{min-width:0}
+.ai-camera-frame{height:290px;border-radius:14px;border:1px dashed #b9cec1;background:#f5faf7;overflow:hidden;display:flex;align-items:center;justify-content:center;position:relative}
+.ai-camera-frame video,.ai-camera-frame img{width:100%;height:100%;object-fit:contain;background:#13251a}
+.ai-camera-frame img[hidden],.ai-camera-frame video[hidden]{display:none}
+.ai-camera-placeholder{display:flex;flex-direction:column;gap:10px;align-items:center;color:#698275;font-size:38px;text-align:center;padding:20px}
+.ai-camera-placeholder span{font-size:14px}
+.ai-camera-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}
+.ai-upload-btn{display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
+.ai-upload-btn input{display:none}
+.ai-status{font-size:13px;line-height:1.5;color:var(--muted);min-height:22px;margin:12px 0}
+.ai-predictions{display:flex;gap:7px;flex-wrap:wrap}
+.ai-pred-chip{background:#edf5ef;border:1px solid #d6e6da;color:#315c40;border-radius:999px;padding:5px 9px;font-size:11px}
+.ai-two-fields{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-top:14px}
+.ai-help{display:block;color:var(--muted);font-size:12px;line-height:1.5;margin-top:6px}
+.ai-generate-btn{width:100%;margin-top:18px}
+.ai-history-section{margin-top:26px}
+.ai-report-card{margin:14px 0;border-left:4px solid #279b5b}
+.ai-report-card.high{border-left-color:#d84242}
+.ai-report-card.medium{border-left-color:#e59a22}
+.ai-report-card.low{border-left-color:#279b5b}
+.ai-report-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start}
+.ai-report-head h3{margin:7px 0 5px}
+.ai-report-head p{margin:0;font-size:12px}
+.ai-report-kicker{font-size:10px;letter-spacing:.08em;color:var(--muted);font-weight:800}
+.ai-risk-pill{white-space:nowrap;border-radius:999px;background:#e8f5ed;color:#176a39;padding:7px 11px;font-size:11px;font-weight:800}
+.ai-report-card.high .ai-risk-pill{background:#fff0f0;color:#a62929}
+.ai-report-card.medium .ai-risk-pill{background:#fff5e7;color:#925c09}
+.ai-report-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:16px}
+.ai-report-grid>div{border:1px solid var(--border);border-radius:10px;padding:11px;min-width:0}
+.ai-report-grid span{display:block;font-size:11px;color:var(--muted);margin-bottom:6px}
+.ai-report-grid b{display:block;font-size:14px;overflow-wrap:anywhere}
+.ai-recommendation{margin:14px 0 0;background:#f5f8f6;border-radius:10px;padding:12px 14px;line-height:1.55;font-size:13px}
+.ai-saving{padding:14px;color:var(--muted)}
+.ai-dashboard-summary{margin-top:24px}
+@media(max-width:900px){.ai-analysis-layout{grid-template-columns:1fr}.ai-report-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.ai-camera-frame{height:230px}.ai-two-fields{grid-template-columns:1fr}.ai-report-head{flex-direction:column}.ai-camera-actions .btn,.ai-upload-btn{flex:1}}
+
+
+/* Monitoring-page AI action buttons */
+.ai-monitor-action{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-top:20px;padding:18px 20px;border:1px solid rgba(111,91,220,.22);border-radius:16px;background:linear-gradient(110deg,rgba(111,91,220,.09),rgba(49,168,143,.07));}
+.ai-monitor-action>div{display:flex;flex-direction:column;gap:5px;min-width:0}
+.ai-monitor-action b{color:var(--text,#172033);font-size:15px}
+.ai-monitor-action small{color:var(--muted,#718096);font-size:12px;line-height:1.5}
+.btn-ai{flex-shrink:0;color:#fff!important;border:0!important;background:linear-gradient(115deg,#6556d9,#2d9d91)!important;box-shadow:0 7px 18px rgba(91,85,190,.2);}
+.btn-ai:hover{filter:brightness(1.06);transform:translateY(-1px)}
+@media(max-width:640px){.ai-monitor-action{align-items:stretch;flex-direction:column}.ai-monitor-action .btn{width:100%}}

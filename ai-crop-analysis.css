@@ -1,39 +1,5 @@
-/* Styles used only by the AI Crop Analysis / AI Reports additions. */
-.ai-model-note{border:1px solid #cfe3d6;background:#f2faf5;color:#385846;padding:14px 16px;border-radius:12px;line-height:1.55;margin:16px 0 22px;font-size:13px}
-.ai-analysis-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:18px;align-items:start}
-.ai-camera-card,.ai-input-card{min-width:0}
-.ai-camera-frame{height:290px;border-radius:14px;border:1px dashed #b9cec1;background:#f5faf7;overflow:hidden;display:flex;align-items:center;justify-content:center;position:relative}
-.ai-camera-frame video,.ai-camera-frame img{width:100%;height:100%;object-fit:contain;background:#13251a}
-.ai-camera-frame img[hidden],.ai-camera-frame video[hidden]{display:none}
-.ai-camera-placeholder{display:flex;flex-direction:column;gap:10px;align-items:center;color:#698275;font-size:38px;text-align:center;padding:20px}
-.ai-camera-placeholder span{font-size:14px}
-.ai-camera-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}
-.ai-upload-btn{display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
-.ai-upload-btn input{display:none}
-.ai-status{font-size:13px;line-height:1.5;color:var(--muted);min-height:22px;margin:12px 0}
-.ai-predictions{display:flex;gap:7px;flex-wrap:wrap}
-.ai-pred-chip{background:#edf5ef;border:1px solid #d6e6da;color:#315c40;border-radius:999px;padding:5px 9px;font-size:11px}
-.ai-two-fields{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-top:14px}
-.ai-help{display:block;color:var(--muted);font-size:12px;line-height:1.5;margin-top:6px}
-.ai-generate-btn{width:100%;margin-top:18px}
-.ai-history-section{margin-top:26px}
-.ai-report-card{margin:14px 0;border-left:4px solid #279b5b}
-.ai-report-card.high{border-left-color:#d84242}
-.ai-report-card.medium{border-left-color:#e59a22}
-.ai-report-card.low{border-left-color:#279b5b}
-.ai-report-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start}
-.ai-report-head h3{margin:7px 0 5px}
-.ai-report-head p{margin:0;font-size:12px}
-.ai-report-kicker{font-size:10px;letter-spacing:.08em;color:var(--muted);font-weight:800}
-.ai-risk-pill{white-space:nowrap;border-radius:999px;background:#e8f5ed;color:#176a39;padding:7px 11px;font-size:11px;font-weight:800}
-.ai-report-card.high .ai-risk-pill{background:#fff0f0;color:#a62929}
-.ai-report-card.medium .ai-risk-pill{background:#fff5e7;color:#925c09}
-.ai-report-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:16px}
-.ai-report-grid>div{border:1px solid var(--border);border-radius:10px;padding:11px;min-width:0}
-.ai-report-grid span{display:block;font-size:11px;color:var(--muted);margin-bottom:6px}
-.ai-report-grid b{display:block;font-size:14px;overflow-wrap:anywhere}
-.ai-recommendation{margin:14px 0 0;background:#f5f8f6;border-radius:10px;padding:12px 14px;line-height:1.55;font-size:13px}
-.ai-saving{padding:14px;color:var(--muted)}
-.ai-dashboard-summary{margin-top:24px}
-@media(max-width:900px){.ai-analysis-layout{grid-template-columns:1fr}.ai-report-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:520px){.ai-camera-frame{height:230px}.ai-two-fields{grid-template-columns:1fr}.ai-report-head{flex-direction:column}.ai-camera-actions .btn,.ai-upload-btn{flex:1}}
+{
+  "projects": {
+    "default": "YOUR_FIREBASE_PROJECT_ID"
+  }
+}

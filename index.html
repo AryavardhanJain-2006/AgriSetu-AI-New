@@ -1,26 +1,37 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Agrisetu | Smart Cold Chain</title>
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="firebase-styles.css" />
-  <link rel="stylesheet" href="ai-crop-analysis.css" />
-</head>
-<body>
-  <div id="app"></div>
+/*
+ * AgriSetu Firebase web configuration.
+ * This is the public Firebase Web App config for project agrisetu-479fe.
+ * The API key identifies the Firebase project; it is not an Admin SDK secret.
+ * Access to Realtime Database is enforced by database.rules.json.
+ */
+window.AGRISETU_FIREBASE_CONFIG = {
+  apiKey: "AIzaSyBFrKb29RG0m4dMirGHPbfm0DiCXd0g7Gs",
+  authDomain: "agrisetu-479fe.firebaseapp.com",
+  databaseURL: "https://agrisetu-479fe-default-rtdb.firebaseio.com/",
+  projectId: "agrisetu-479fe",
+  storageBucket: "agrisetu-479fe.firebasestorage.app",
+  messagingSenderId: "956925596627",
+  appId: "1:956925596627:web:7f3b6f6597b7b113535526"
+};
 
-  <!-- Firebase compat SDKs: loaded before the existing app scripts. -->
-  <script src="https://www.gstatic.com/firebasejs/13.3.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/13.3.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/13.3.0/firebase-database-compat.js"></script>
-  <script src="firebase-config.js"></script>
-  <script src="app.js"></script>
-  <script src="firebase-integration.js"></script>
-  <!-- Browser-side MobileNetV2 classifier; no separate Python server or checkpoint required. -->
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js"></script>
-  <script src="ai-crop-analysis.js"></script>
-</body>
-</html>
+/*
+ * Facility IDs must match the ESP32 FACILITY_ID and Firebase database paths.
+ * A farmer sees a facility after an accepted booking creates /monitoringAccess/{uid}/facilityIds/{facilityId}.
+ */
+window.AGRISETU_FACILITIES = {
+  COLD_BOX_01: {
+    name: "Agra Cold Storage",
+    location: "Agra",
+    storageKey: "agra-cold-storage"
+  },
+  GREEN_FRESH_01: {
+    name: "Green Fresh Storage",
+    location: "Mathura",
+    storageKey: "green-fresh-storage"
+  },
+  YAMUNA_COLD_01: {
+    name: "Yamuna Cold Chain",
+    location: "Firozabad",
+    storageKey: "yamuna-cold-chain"
+  }
+};
