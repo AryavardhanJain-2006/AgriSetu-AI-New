@@ -1,3 +1,9 @@
+const ALLOWED_VEGETABLES = [
+    "tomato",
+    "potato",
+    "onion",
+    "carrot"
+];
 /* AgriSetu AI Analysis add-on. Additive only: does not edit app.js or Firebase data. */
 (function () {
   "use strict";
@@ -394,6 +400,30 @@ async function loadTrainedModel() {
 
     try {
       const predictions = await identifyImage();
+      const bestPrediction = predictions[0];
+
+const predictedName = bestPrediction.label
+    .toLowerCase()
+    .replace(/[_-]/g, " ")
+    .trim();
+
+if (!ALLOWED_VEGETABLES.includes(predictedName)) {
+    detectedLabel.textContent = "Unsupported vegetable";
+
+    detectionStatus.textContent =
+        "AgriSetu currently supports only Tomato, Potato, Onion and Carrot.";
+
+    result.innerHTML = `
+        <p class="agri-ai-error">
+            This produce is not in AgriSetu's supported vegetable list.
+            Please upload Tomato, Potato, Onion or Carrot.
+        </p>
+    `;
+
+    lastResult = null;
+    reportButton.disabled = true;
+    return;
+}
       if (!predictions.length) throw new Error("The model returned no predictions.");
       const cfg = await loadConfig();
       const manualLabel = cropSelect.value;
