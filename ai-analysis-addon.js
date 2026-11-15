@@ -213,6 +213,10 @@ const supportedLabels = labels.filter(label =>
     ALLOWED_VEGETABLES.includes(normaliseLabel(label))
 );
 
+const supportedLabels = labels.filter(label =>
+    ALLOWED_VEGETABLES.includes(normaliseLabel(label))
+);
+
 select.innerHTML =
     `<option value="">Use AI prediction</option>` +
     supportedLabels.map(label => {
@@ -223,6 +227,7 @@ select.innerHTML =
             ${escapeHTML(prettyLabel(label) + suffix)}
         </option>`;
     }).join("");
+
 
       select.value = "";
       modal.querySelector("#agri-ai-detected-crop").textContent = "Not identified yet";
