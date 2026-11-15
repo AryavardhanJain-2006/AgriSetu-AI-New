@@ -387,7 +387,7 @@ async function loadTrainedModel() {
       return Array.from(scores)
         .map((score, index) => ({ label: labels[index], probability: Number(score) }))
         .sort((a, b) => b.probability - a.probability)
-        .slice(0, 5);
+        .slice(0, 36);
     } finally {
       input.dispose();
       if (output && typeof output.dispose === "function") output.dispose();
@@ -417,41 +417,53 @@ async function loadTrainedModel() {
     result.innerHTML = '<p>Loading your trained 36-class model and analysing the image. The first load may take a little time.</p>';
 
     try {
-      const predictions = await identifyImage();
-      const bestPrediction = predictions[0];
+      
+const predictions = await identifyImage();
 
-const predictedName = bestPrediction.label
-    .toLowerCase()
-    .replace(/[_-]/g, " ")
-    .trim();
-
-if (!ALLOWED_VEGETABLES.includes(predictedName)) {
-    detectedLabel.textContent = "Unsupported vegetable";
-
-    detectionStatus.textContent =
-        "AgriSetu currently supports only Tomato, Potato, Onion and Carrot.";
-
-    result.innerHTML = `
-        <p class="agri-ai-error">
-            This produce is not in AgriSetu's supported vegetable list.
-            Please upload Tomato, Potato, Onion or Carrot.
-        </p>
-    `;
-
-    lastResult = null;
-    reportButton.disabled = true;
-    return;
+if (!predictions.length) {
+    throw new Error("The model returned no predictions.");
 }
-      if (!predictions.length) throw new Error("The model returned no predictions.");
-      const cfg = await loadConfig();
-      const manualLabel = cropSelect.value;
-      const best = manualLabel
-        ? { label: manualLabel, probability: (predictions.find(p => p.label === manualLabel) || {}).probability ?? null }
-        : predictions[0];
-      const chosenLabel = best.label;
-      const cropKey = configKeyForLabel(chosenLabel, cfg);
+
+const cfg = await loadConfig();
+const manualLabel = cropSelect.value;
+
+const allowedPredictions = predictions.filter(p =>
+    ALLOWED_VEGETABLES.includes(normaliseLabel(p.label))
+);
+
+let best;
+
+if (manualLabel) {
+    if (!ALLOWED_VEGETABLES.includes(normaliseLabel(manualLabel))) {
+        throw new Error("Only Tomato, Potato, Onion and Carrot are supported.");
+    }
+
+    best = predictions.find(p => p.label === manualLabel) || {
+        label: manualLabel,
+        probability: null
+    };
+} else {
+    best = allowedPredictions[0];
+
+    if (!best) {
+        detectedLabel.textContent = "Unsupported vegetable";
+        detectionStatus.textContent =
+            "Please upload Tomato, Potato, Onion or Carrot.";
+
+        result.innerHTML =
+            '<p class="agri-ai-error">No supported vegetable was found in the model predictions.</p>';
+
+        lastResult = null;
+        reportButton.disabled = true;
+        return;
+    }
+}
+
+const chosenLabel = best.label;
+const cropKey = configKeyForLabel(chosenLabel, cfg);
+
       const crop = cropKey ? cfg.crops[cropKey] : null;
-      const top = predictions.map(p =>
+      const top = predictions.slice(0, 5).map(p =>
         `${prettyLabel(p.label)} (${(p.probability * 100).toFixed(1)}% model score)`
       ).join(", ");
 
