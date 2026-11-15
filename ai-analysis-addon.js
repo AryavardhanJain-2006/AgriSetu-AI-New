@@ -208,14 +208,13 @@ function addControls() {
 const labels = await loadClassNames();
 
 const select = modal.querySelector("#agri-ai-crop");
-
-const supportedLabels = labels.filter(label =>
+const allowedDropdownLabels = labels.filter(label =>
     ALLOWED_VEGETABLES.includes(normaliseLabel(label))
 );
 
 select.innerHTML =
     `<option value="">Use AI prediction</option>` +
-    supportedLabels.map(label => {
+    allowedDropdownLabels.map(label => {
         const key = configKeyForLabel(label, cfg);
         const suffix = key ? " · shelf-life profile available" : "";
 
