@@ -204,13 +204,26 @@ function addControls() {
     modal.querySelector("#agri-ai-condition").value = "";
     try {
       const cfg = await loadConfig();
-      const labels = await loadClassNames();
-      const select = modal.querySelector("#agri-ai-crop");
-      select.innerHTML = `<option value="">Use AI prediction</option>` + labels.map(label => {
+      
+const labels = await loadClassNames();
+
+const select = modal.querySelector("#agri-ai-crop");
+
+const supportedLabels = labels.filter(label =>
+    ALLOWED_VEGETABLES.includes(normaliseLabel(label))
+);
+
+select.innerHTML =
+    `<option value="">Use AI prediction</option>` +
+    supportedLabels.map(label => {
         const key = configKeyForLabel(label, cfg);
         const suffix = key ? " · shelf-life profile available" : "";
-        return `<option value="${escapeHTML(label)}">${escapeHTML(prettyLabel(label) + suffix)}</option>`;
-      }).join("");
+
+        return `<option value="${escapeHTML(label)}">
+            ${escapeHTML(prettyLabel(label) + suffix)}
+        </option>`;
+    }).join("");
+
       select.value = "";
       modal.querySelector("#agri-ai-detected-crop").textContent = "Not identified yet";
       modal.querySelector("#agri-ai-detection-status").textContent = "AI will suggest a crop after image analysis. Use the optional dropdown only if the suggestion is wrong.";
