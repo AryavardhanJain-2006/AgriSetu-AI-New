@@ -323,13 +323,24 @@ function addControls() {
     return cfg && cfg.crops && cfg.crops[key] ? key : "";
   }
 
-  async function loadTrainedModel() {
+ 
+async function loadTrainedModel() {
     if (trainedModel) return trainedModel;
-    await loadScript("https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js");
+
+    await loadScript(
+        "https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"
+    );
+
     await tf.ready();
-    trainedModel = await tf.loadLayersModel(MODEL_URL);
+
+    // Load the converted TensorFlow.js GraphModel
+    trainedModel = await tf.loadGraphModel(MODEL_URL);
+
+    console.log("AgriSetu GraphModel loaded successfully");
+
     return trainedModel;
-  }
+}
+
 
   async function identifyImage() {
     if (!currentImage) throw new Error("Choose an image or capture a camera frame first.");
